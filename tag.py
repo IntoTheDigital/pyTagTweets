@@ -14,10 +14,12 @@ from collections import Counter
 #from sklearn.feature_extraction.text import CountVectorizer
 query = 'chicago'
 
-my_oauth = OAuth1('XXX',
-                  client_secret='XXX',
-                  resource_owner_key='XXX',
-                  resource_owner_secret='XXX')
+f=open('configuration.txt','rb')
+my_secrets = lines = [line.strip() for line in f]
+my_oauth = OAuth1(my_secrets[0],
+                  client_secret=my_secrets[1],
+                  resource_owner_key=my_secrets[2],
+                  resource_owner_secret=my_secrets[3])
 
 complete_url = 'https://api.twitter.com/1.1/search/tweets.json?q='+query+'&count=100'
 
