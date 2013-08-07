@@ -1,18 +1,14 @@
-import pygame
-#import matplotlib.pyplot as plt
-import matplotlib.image as mpimg
+#import pygame
 from pytagcloud import create_tag_image, make_tags, LAYOUTS
 from pytagcloud.lang.counter import get_tag_counts
 from requests_oauthlib import OAuth1
 import requests
 import operator
-#import pprint as pp
 import string
-
-#import numpy as np
 from collections import Counter
-#from sklearn.feature_extraction.text import CountVectorizer
+
 query = 'chicago'
+limit = 100
 
 f=open('configuration.txt','rb')
 my_secrets = lines = [line.strip() for line in f]
@@ -21,7 +17,7 @@ my_oauth = OAuth1(my_secrets[0],
                   resource_owner_key=my_secrets[2],
                   resource_owner_secret=my_secrets[3])
 
-complete_url = 'https://api.twitter.com/1.1/search/tweets.json?q='+query+'&count=100'
+complete_url = 'https://api.twitter.com/1.1/search/tweets.json?q='+query+'&count='+str(limit)
 
 tweets_words = [query, 'http', 'amp']
 stop_words = [
@@ -203,52 +199,30 @@ stop_words = [
 ]
 
 stop_words+=tweets_words        
-#plt.ion()
 exclude = set(string.punctuation) 
-#plt.show()
+
 while True:
 	my_text=''
 	r = requests.get(complete_url, auth=my_oauth)
 	tweets = r.json()
-	#pp.pprint (tweets['statuses'][1]['text'])
 	for tweet in tweets['statuses']:
-		#print type(tweet['text'])
 		text=tweet['text'].lower()
 		text = ''.join(ch for ch in text if ch not in exclude)
-		#print unicode(text).encode('utf-8')
 		important_words = text
 		my_text+=important_words
-	# f = open("my_text.txt")
-	# lines = f.readlines()
 
-	# my_text = ' '.join(lines)
 	words = my_text.split()
-	
 	counts = Counter(words)  
 	for word in stop_words:
 		del counts[word]
 
-	#words = np.array(cv.get_feature_names()) 
-	# normalize                                                                                                                                             
-	#counts = counts / float(counts.max())
 	for key in counts.keys():
 		if len(key)<3 or key.startswith('http'):
 			del counts[key]
-	final = counts.most_common(180)
-	#print final
-	max_count = max(final, key=operator.itemgetter(1))[1]
-	print "eccolo"
-	final = [(name,count/float(max_count))for name,count in final]
-	print max_count
-	# for items in final:
-	# 	print items[1]/float(max_count)
-	#  	items[1]=items[1]/float(max_count)
-	tags = make_tags(final, maxsize=80)
 
+	final = counts.most_common(180)
+	max_count = max(final, key=operator.itemgetter(1))[1]
+	final = [(name,count/float(max_count))for name,count in final]
+	tags = make_tags(final, maxsize=80)
 	create_tag_image(tags, 'cloud_large.png', size=(1280, 800), layout=3, fontname='Lobster', background = (255,255,255))
-	print "created"
-	
-	#img=mpimg.imread('cloud_large.png')
-	#imgplot = plt.imshow(img)
-	#plt.draw()
-	#plt.pause(5)
+	print "new png created"
