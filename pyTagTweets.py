@@ -5,18 +5,26 @@ import requests
 import operator
 from collections import Counter
 import time
+import urllib
 
-query = 'chicago'
+query = '#chicago'
 limit = 200
 layout = 3
 background_color = (255, 255, 255)
 max_word_size = 80
 max_words = 180
 wait_time = 10  # time interval between two tag clouds are created in seconds
+width = 1280
+height = 800
 
 f = open('stopwords.txt', 'rb')
 stop_words = [line.strip() for line in f]  # loading common English stopwords from file
-tweets_words = [query, '#' + query, 'http', 'amp']  # common words in tweets
+tweets_words = [query, 'http', 'amp']  # common words in tweets
+if(query.startswith('#')):
+	tweets_words.append(query[1:])
+	print query[1:]
+else:
+	tweets_words.append('#'+query)
 stop_words += tweets_words  # add common words in tweets to stopwords
 punctuation = "!\"$%&'()*+,-./:;<=>?[\]^_`{|}~'"  # characters exluded from tweets
 
@@ -28,7 +36,7 @@ my_oauth = OAuth1(my_secrets[0],
                   resource_owner_key=my_secrets[2],
                   resource_owner_secret=my_secrets[3])
 
-complete_url = 'https://api.twitter.com/1.1/search/tweets.json?q=' + query + '&count=' + str(limit)
+complete_url = 'https://api.twitter.com/1.1/search/tweets.json?q=' + urllib.quote(query) + '&count=' + str(limit)
 
 while True:
     my_text = ''
@@ -53,6 +61,6 @@ while True:
     max_count = max(final, key=operator.itemgetter(1))[1]
     final = [(name, count / float(max_count))for name, count in final]
     tags = make_tags(final, maxsize=max_word_size)
-    create_tag_image(tags, 'cloud_large.png', size=(1280, 800), layout=layout, fontname='Lobster', background = background_color)
+    create_tag_image(tags, 'cloud_large.png', size=(width, height), layout=layout, fontname='Lobster', background = background_color)
     print "new png created"
     time.sleep(wait_time)
