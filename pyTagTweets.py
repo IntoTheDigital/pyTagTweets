@@ -23,7 +23,7 @@ f=open('stopwords.txt','rb')
 tweets_words = [query, 'http', 'amp']
 stop_words = [line.strip() for line in f]
 stop_words+=tweets_words        
-exclude = set(string.punctuation) 
+exclude = set(string.punctuation.replace('#','').replace('@',''))
 
 while True:
 	my_text=''
