@@ -20,7 +20,7 @@ my_oauth = OAuth1(my_secrets[0],
 complete_url = 'https://api.twitter.com/1.1/search/tweets.json?q='+query+'&count='+str(limit)
 
 f=open('stopwords.txt','rb')
-tweets_words = [query, 'http', 'amp']
+tweets_words = [query, '#' + query, 'http', 'amp']
 stop_words = [line.strip() for line in f]
 stop_words+=tweets_words        
 exclude = set(string.punctuation.replace('#','').replace('@',''))
