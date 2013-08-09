@@ -14,20 +14,21 @@ max_word_size = 80
 max_words = 180
 wait_time = 10  # time interval between two tag clouds are created in seconds
 
+f = open('stopwords.txt', 'rb')
+stop_words = [line.strip() for line in f]  # loading common English stopwords from file
+tweets_words = [query, '#' + query, 'http', 'amp']  # common words in tweets
+stop_words += tweets_words  # add common words in tweets to stopwords
+punctuation = "!\"$%&'()*+,-./:;<=>?[\]^_`{|}~'"  # characters exluded from tweets
+
 f = open('configuration.txt', 'rb')
 my_secrets = [line.strip() for line in f]
+
 my_oauth = OAuth1(my_secrets[0],
                   client_secret=my_secrets[1],
                   resource_owner_key=my_secrets[2],
                   resource_owner_secret=my_secrets[3])
 
 complete_url = 'https://api.twitter.com/1.1/search/tweets.json?q=' + query + '&count=' + str(limit)
-
-f = open('stopwords.txt', 'rb')
-stop_words = [line.strip() for line in f]  # loading common English stopwords from file
-tweets_words = [query, '#' + query, 'http', 'amp']  # common words in tweets
-stop_words += tweets_words  # add common words in tweets to stopwords
-punctuation = "!\"$%&'()*+,-./:;<=>?[\]^_`{|}~'"
 
 while True:
     my_text = ''
